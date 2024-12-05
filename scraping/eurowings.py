@@ -1,46 +1,72 @@
 from playwright.sync_api import sync_playwright
 from playwright_stealth import stealth_sync
 from bs4 import BeautifulSoup
-import time
+
+
 
 def scrape_flight_data(page, url):
     print(f"Accessing URL: {url}")
     page.goto(url, wait_until="domcontentloaded")
-    
-    page.wait_for_timeout(5223)
+
+    page.wait_for_selector('.o-flight-select', timeout=15231)
+
+    page.wait_for_timeout(2314)
 
     content = page.content()
     
     soup = BeautifulSoup(content, 'html.parser')
-    print(soup.prettify())
-    
-    maps = [
-        'flight-info__hour', 'origin-airport',
-        'card-flight-num__content', 'flight_duration', 'destination-airport'
-    ]
-    
-    results = []
-    vals = []
-    start = False
-    
-    for line in soup.prettify().splitlines():
-        if 'flights-price-simple' in line:
-            start = not start
-            continue
-        if start:
-            if any(val in line for val in maps):
-                vals.append(line.strip())
-            if len(vals) == len(maps):
-                results.append({
-                    "departure_time": vals[0],
-                    "origin_airport": vals[1],
-                    "flight_number": vals[2],
-                    "flight_duration": vals[3],
-                    "destination_airport": vals[4],
-                })
-                vals = []
-    
-    return results
+    txt = soup.prettify()
+    with open("eurowings.txt", "w", encoding='utf-8') as file:
+        file.write(txt)
+
+    # Find all flight-card divs
+    flight_cards = soup.find_all('div', class_='o-flight-card')
+
+    # List to store flight information dictionaries
+    flights_info = []
+
+    # Loop through each flight card
+    for card in flight_cards:
+        flight_info = {}
+
+        # Extract origin and destination
+        origin = card.find('div', class_='o-flight-item__text').text.strip()
+        destination = card.find_all('div', class_='o-flight-item__text')[-1].text.strip()
+
+        # Extract times for departure and arrival
+        times = card.find_all('div', class_='o-flight-item__title')
+        departure_time = times[0].text.strip()
+        arrival_time = times[-1].text.strip()
+
+        # Extract stop information
+        stop_info = card.find('div', class_='o-flight-item__text-s').text.strip()
+
+        # Extract flight fare details
+        fares = []
+        fare_items = card.find_all('article', class_='flight-tariff')
+        for fare in fare_items:
+            fare_type = fare.find('h4', class_='flight-tariff-module__type--XiCoI').text.strip()
+            fare_price = fare.find('span', class_='farePriceSelect-module__priceVal--lBLXC').text.strip()
+            fare_availability = fare.find('p', class_='farePriceSelect-module__availability--qLGXV').text.strip() if fare.find('p', class_='farePriceSelect-module__availability--qLGXV') else "N/A"
+            fares.append({
+                'type': fare_type,
+                'price': fare_price,
+                'availability': fare_availability
+            })
+
+        # Compile all extracted data into a dictionary for the current flight
+        flight_info['origin'] = origin
+        flight_info['destination'] = destination
+        flight_info['departure_time'] = departure_time
+        flight_info['arrival_time'] = arrival_time
+        flight_info['stop_info'] = stop_info
+        flight_info['fares'] = fares
+
+        # Add the current flight's info to the list
+        flights_info.append(flight_info)
+
+    # Output the list of all extracted flight information
+    print(flights_info)
 
 def main():
     _from = 'OTP'
@@ -50,8 +76,9 @@ def main():
     ]
     
     with sync_playwright() as p:
-        browser = p.firefox.launch(headless=True)
-        page = browser.new_page()
+        browser = p.webkit.launch(headless=True)
+        context = browser.new_context()
+        page = context.new_page()
         stealth_sync(page)
         
         for _, _to in airports:
