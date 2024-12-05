@@ -15,11 +15,7 @@ def scrape_flight_data(page, url):
     content = page.content()
     
     soup = BeautifulSoup(content, 'html.parser')
-    txt = soup.prettify()
-    with open("eurowings.txt", "w", encoding='utf-8') as file:
-        file.write(txt)
 
-    # Find all flight-card divs
     flight_cards = soup.find_all('div', class_='o-flight-card')
 
     # List to store flight information dictionaries
@@ -46,15 +42,25 @@ def scrape_flight_data(page, url):
         fare_items = card.find_all('article', class_='flight-tariff')
         for fare in fare_items:
             fare_type = fare.find('h4', class_='flight-tariff-module__type--XiCoI').text.strip()
-            fare_price = fare.find('span', class_='farePriceSelect-module__priceVal--lBLXC').text.strip()
-            fare_availability = fare.find('p', class_='farePriceSelect-module__availability--qLGXV').text.strip() if fare.find('p', class_='farePriceSelect-module__availability--qLGXV') else "N/A"
+
+            fare_price_element = fare.find('span', class_='farePriceSelect-module__priceVal--lBLXC')
+            if fare_price_element:
+                fare_price = fare_price_element.text.strip()
+            else:
+                fare_price = "N/A"
+
+            fare_availability_element = fare.find('p', class_='farePriceSelect-module__availability--qLGXV')
+            if fare_availability_element:
+                fare_availability = fare_availability_element.text.strip()
+            else:
+                fare_availability = "N/A"
+            
             fares.append({
                 'type': fare_type,
                 'price': fare_price,
                 'availability': fare_availability
             })
 
-        # Compile all extracted data into a dictionary for the current flight
         flight_info['origin'] = origin
         flight_info['destination'] = destination
         flight_info['departure_time'] = departure_time
