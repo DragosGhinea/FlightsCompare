@@ -3,14 +3,17 @@ from playwright_stealth import stealth_sync
 from bs4 import BeautifulSoup
 
 
-
 def scrape_flight_data(page, url):
     print(f"Accessing URL: {url}")
     page.goto(url, wait_until="domcontentloaded")
 
-    page.wait_for_selector('.o-flight-select', timeout=15231)
+    try:
+        page.wait_for_selector('.o-flight-select', timeout=10231)
+    except:
+        print("No flights found")
+        return []
 
-    page.wait_for_timeout(2314)
+    page.wait_for_timeout(2314) # Flights load slower than the section holding them
 
     content = page.content()
     
@@ -71,46 +74,80 @@ def scrape_flight_data(page, url):
         # Add the current flight's info to the list
         flights_info.append(flight_info)
 
-    # Output the list of all extracted flight information
-    print(flights_info)
+    return flights_info
 
-def main():
-    _from = 'OTP'
-    airports = [
-        ("Birmingham", "BHX"),
-        ("Bristol", "BRS"),
-    ]
-    
+
+def scrape_flight_data_on_dates(dates, _from, _to):
+    data = {}
+
     with sync_playwright() as p:
         browser = p.webkit.launch(headless=True)
         context = browser.new_context()
         page = context.new_page()
         stealth_sync(page)
+
+        for date in dates:
+            year, month, day = date
+
+            url = (f'https://www.eurowings.com/en/booking/flights/flight-search.html'
+                    f'?isReward=false&destination={_to}&origin={_from}'
+                    f'&source=web&origins={_from}&fromdate={year}-{month}-{day}'
+                    f'&triptype=oneway&adults=1&children=0&infants=0&lng=en-GB#/book-flights/select')
+            
+            flight_data = scrape_flight_data(page, url)
+            data[f"{year}-{month}-{day}"] = flight_data
+
+    return data
+
+
+airports = [
+    ("Birmingham", "BHX"),
+    ("Bristol", "BRS"),
+    ("Edinburgh", "EDI"),
+    ("Leeds Bradford", "LBA"),
+    ("London Stansted", "STN"),
+    ("Manchester", "MAN"),
+    ("Madrid", "MAD"),
+    ("Málaga", "AGP"),
+    ("Palma de Mallorca", "PMI"),
+    ("Bologna", "BLQ"),
+    ("Catania", "CTA"),
+    ("Tel Aviv", "TLV"),
+    ("Dublin", "DUB"),
+    ("Amman (Jordan)", "AMM"),
+    ("Malta", "MLA"),
+    ("Chania (Crete)", "CHQ"),
+    ("Corfu", "CFU"),
+    ("Skiathos", "JSI"),
+    ("Thessaloniki", "SKG"),
+    ("Genoa", "GOA"),
+    ("Berlin", "BER"),
+    ("Marseille", "MRS"),
+    ("Paris Beauvais", "BVA"),
+    ("Milan (Linate)", "LIN"),
+    ("Paphos", "PFO"),
+    ("Zadar", "ZAD"),
+    ("Brussels Charleroi", "CRL"),
+    ("Tirana", "TIA"),
+    ("Vienna", "VIE"),
+    ("Milan Malpensa", "MXP"),
+    ("Milan Bergamo", "BGY"),
+    ("Naples (Napoli)", "NAP"),
+    ("Palermo", "PMO"),
+    ("Perugia", "PEG"),
+    ("Pescara", "PSR"),
+    ("Pisa", "PSA"),
+    ("Rome Ciampino", "CIA"),
+    ("Venice Treviso", "TSF")
+]
+
+def main():
+    _from = 'OTP'
         
-        for _, _to in airports:
-            for year in (2024, 2025):
-                for month in (11, 12, 1, 2, 3):
-                    if month < 10: month = f"0{month}"
-                    for day in range(1, 31):
-                        if day < 10: day = f"0{day}"
-                        
-                        year, month, day = 2024, "12", "13"
-                        
-                        url = (f'https://www.eurowings.com/en/booking/flights/flight-search.html'
-                               f'?isReward=false&destination={_to}&origin={_from}'
-                               f'&source=web&origins={_from}&fromdate={year}-{month}-{day}'
-                               f'&triptype=oneway&adults=1&children=0&infants=0&lng=en-GB#/book-flights/select')
-                        
-                        flight_data = scrape_flight_data(page, url)
-                        for flight in flight_data:
-                            print(f"Flight: {flight}")
-                        
-                        break
-                    break
-                break
-            break
-        
-        browser.close()
+    for _, _to in airports:
+        flights_data = scrape_flight_data_on_dates([(2024, 12, 13)], _from, _to)
+        print(flights_data)
+
 
 if __name__ == "__main__":
     main()
