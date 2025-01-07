@@ -24,7 +24,7 @@ public class CustomErrorAttributes extends DefaultErrorAttributes {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             String hashedMessage = Base64.getEncoder().encodeToString(digest.digest(message.getBytes()));
             errorAttributes.put("message", "Error reference: "+hashedMessage);
-            log.warning("An internal server error has occured:\n"+message+"\nWith reference: "+hashedMessage);
+            log.warning("An internal server error has occurred:\n"+message+"\nWith reference: "+hashedMessage);
         }
 
         return errorAttributes;
