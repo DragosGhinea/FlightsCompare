@@ -1,5 +1,6 @@
 package com.example.FlightsCompare.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -36,6 +37,7 @@ public class LinkedProvider {
     @EqualsAndHashCode.Exclude
     @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "id", insertable = false, updatable = false)
+    @JsonBackReference
     private User user;
 
     private Long linkedAtDateInSeconds;
