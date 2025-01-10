@@ -1,7 +1,9 @@
 package com.example.FlightsCompare.controller;
 
+import com.example.FlightsCompare.model.dto.LoginRequestDto;
 import com.example.FlightsCompare.model.dto.OAuth2UserRequestDto;
 import com.example.FlightsCompare.model.dto.RefreshAccessTokenPairDto;
+import com.example.FlightsCompare.model.dto.RegisterRequestDto;
 import com.example.FlightsCompare.service.AuthenticationService;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
@@ -26,9 +28,19 @@ public class AuthenticationController {
 
     private final AuthenticationService authenticationService;
 
-    @PostMapping("/login")
+    @PostMapping("/login/oauth2")
     public ResponseEntity<RefreshAccessTokenPairDto> login(@RequestBody OAuth2UserRequestDto oAuth2UserRequestDTO) {
          return ResponseEntity.ok(authenticationService.authenticate(oAuth2UserRequestDTO));
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<RefreshAccessTokenPairDto> login(@RequestBody LoginRequestDto loginRequestDto) {
+        return ResponseEntity.ok(authenticationService.authenticate(loginRequestDto));
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<RefreshAccessTokenPairDto> register(@RequestBody RegisterRequestDto registerRequestDto) {
+        return ResponseEntity.ok(authenticationService.authenticate(registerRequestDto));
     }
 
     @PostMapping("/refresh")

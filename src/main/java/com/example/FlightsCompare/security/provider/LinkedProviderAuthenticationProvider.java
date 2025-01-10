@@ -1,23 +1,22 @@
-package com.example.FlightsCompare.security;
+package com.example.FlightsCompare.security.provider;
 
 import com.example.FlightsCompare.model.User;
 import com.example.FlightsCompare.model.dto.OAuth2UserRequestDto;
+import com.example.FlightsCompare.security.tokens.LinkedProviderToken;
 import com.example.FlightsCompare.service.impl.OAuth2ToUserServiceCentralized;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.stereotype.Component;
 
-@Component
 @RequiredArgsConstructor
-public class TokenAuthenticationProvider implements AuthenticationProvider {
+public class LinkedProviderAuthenticationProvider implements AuthenticationProvider {
 
     private final OAuth2ToUserServiceCentralized authenticationService;
 
     /**
-     * Receive UsernamePasswordAuthenticationToken
+     * Receive UsernamePasswordAuthenticationToken as LinkedProviderToken
      * where username is the provider
      * where password is the access_token
      */
@@ -37,6 +36,6 @@ public class TokenAuthenticationProvider implements AuthenticationProvider {
 
     @Override
     public boolean supports(Class<?> authentication) {
-        return authentication.equals(UsernamePasswordAuthenticationToken.class);
+        return authentication.equals(LinkedProviderToken.class);
     }
 }
