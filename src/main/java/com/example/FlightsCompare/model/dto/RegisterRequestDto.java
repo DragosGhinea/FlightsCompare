@@ -1,6 +1,5 @@
 package com.example.FlightsCompare.model.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 @NoArgsConstructor
