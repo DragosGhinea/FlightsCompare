@@ -1,6 +1,11 @@
 package com.example.FlightsCompare.config;
 
-import com.example.FlightsCompare.security.TokenAuthenticationProvider;
+import com.example.FlightsCompare.security.provider.CentralizedAuthenticationProvider;
+import com.example.FlightsCompare.security.provider.LinkedProviderAuthenticationProvider;
+import com.example.FlightsCompare.security.provider.LoginCredentialsAuthenticationProvider;
+import com.example.FlightsCompare.security.provider.RegisterCredentialsAuthenticationProvider;
+import com.example.FlightsCompare.service.CredentialsToUserService;
+import com.example.FlightsCompare.service.impl.OAuth2ToUserServiceCentralized;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,10 +27,11 @@ import java.util.List;
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig {
-    private final TokenAuthenticationProvider tokenAuthenticationProvider;
+    private final CentralizedAuthenticationProvider centralizedAuthenticationProvider;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+
         http
                 .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
@@ -39,7 +45,7 @@ public class SecurityConfig {
                                 .requestMatchers("h2-console/**").permitAll()
                                 .anyRequest().permitAll()
                 )
-                .authenticationProvider(tokenAuthenticationProvider)
+                .authenticationProvider(centralizedAuthenticationProvider)
                 ;
 
         // Fix H2 database console: Refused to display ' in a frame because it set 'X-Frame-Options' to 'deny'

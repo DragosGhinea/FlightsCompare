@@ -44,7 +44,9 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private List<LinkedProvider> linkedProviders = new ArrayList<>();
 
-
+    @OneToOne(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JsonIgnore
+    private UserCredentials credentials;
 
 
     @Override

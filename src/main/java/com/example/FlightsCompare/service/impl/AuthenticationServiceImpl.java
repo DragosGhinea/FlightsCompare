@@ -3,8 +3,13 @@ package com.example.FlightsCompare.service.impl;
 import com.example.FlightsCompare.exception.RefreshTokenExpired;
 import com.example.FlightsCompare.model.RefreshToken;
 import com.example.FlightsCompare.model.User;
+import com.example.FlightsCompare.model.dto.LoginRequestDto;
 import com.example.FlightsCompare.model.dto.OAuth2UserRequestDto;
 import com.example.FlightsCompare.model.dto.RefreshAccessTokenPairDto;
+import com.example.FlightsCompare.model.dto.RegisterRequestDto;
+import com.example.FlightsCompare.security.tokens.LinkedProviderToken;
+import com.example.FlightsCompare.security.tokens.LoginToken;
+import com.example.FlightsCompare.security.tokens.RegisterToken;
 import com.example.FlightsCompare.service.AuthenticationService;
 import com.example.FlightsCompare.service.TokenService;
 import lombok.RequiredArgsConstructor;
@@ -20,15 +25,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final AuthenticationManager authenticationManager;
     private final TokenService tokenService;
 
-    @Override
-    public RefreshAccessTokenPairDto authenticate(OAuth2UserRequestDto oAuth2UserRequestDto) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        oAuth2UserRequestDto.getClientRegistrationId(),
-                        oAuth2UserRequestDto.getAccessToken()
-                )
-        );
-
+    private RefreshAccessTokenPairDto fromAuthentication(Authentication authentication) {
         if (!(authentication.getPrincipal() instanceof User user)) {
             throw new RuntimeException("AuthenticationManager returned an unexpected user type");
         }
@@ -42,6 +39,44 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .refreshToken(refreshTokenDto.getRefreshToken())
                 .accessToken(accessToken)
                 .build();
+    }
+
+    @Override
+    public RefreshAccessTokenPairDto authenticate(OAuth2UserRequestDto oAuth2UserRequestDto) {
+        Authentication authentication = authenticationManager.authenticate(
+                new LinkedProviderToken(
+                        oAuth2UserRequestDto.getClientRegistrationId(),
+                        oAuth2UserRequestDto.getAccessToken()
+                )
+        );
+
+        return fromAuthentication(authentication);
+    }
+
+    @Override
+    public RefreshAccessTokenPairDto authenticate(LoginRequestDto loginRequestDto) {
+        Authentication authentication = authenticationManager.authenticate(
+                new LoginToken(
+                        loginRequestDto.getEmail(),
+                        loginRequestDto.getPassword()
+                )
+        );
+
+        return fromAuthentication(authentication);
+    }
+
+    @Override
+    public RefreshAccessTokenPairDto authenticate(RegisterRequestDto registerRequestDto) {
+        Authentication authentication = authenticationManager.authenticate(
+                new RegisterToken(
+                        registerRequestDto.getUsername(),
+                        registerRequestDto.getEmail(),
+                        registerRequestDto.getPassword(),
+                        registerRequestDto.getAccessToken()
+                )
+        );
+
+        return fromAuthentication(authentication);
     }
 
     @Override
