@@ -36,6 +36,67 @@ public class FlightController {
         return allFlightsToCity;
     }
 
+    @GetMapping("/allFlightsLowerThan/{price}")
+    public List<Flight> getAllFlightsLowerThan(@PathVariable(name = "price") Double price) {
+
+        List<Flight> allFlightsCheaperThanPrice = flightRepository
+                .findAll()
+                .stream()
+                .filter(flight -> flight.getPrice() <= price)
+                .toList();
+
+        return allFlightsCheaperThanPrice;
+    }
+
+    @GetMapping("/allFlightsGreaterThan/{price}")
+    public List<Flight> getAllFlightsGreaterThan(@PathVariable(name = "price") Double price) {
+
+        List<Flight> allFlightsGreaterThanPrice = flightRepository
+                .findAll()
+                .stream()
+                .filter(flight -> flight.getPrice() >= price)
+                .toList();
+
+        return allFlightsGreaterThanPrice;
+    }
+
+    @GetMapping("/allFlightsOnDate")
+    public List<Flight> getAllFlightsOnDate(@RequestParam("year") String year,
+                                            @RequestParam("month") String month,
+                                            @RequestParam("day") String day) {
+
+        List<Flight> allFlightsOnDate = flightRepository
+                .findAll()
+                .stream()
+                .filter(flight -> flight.getYearValue().equals(year) &&
+                                  flight.getMonthValue().equals(month) &&
+                                  flight.getDayValue().equals(day)
+                       )
+                .toList();
+
+        return allFlightsOnDate;
+    }
+
+    @GetMapping("/allFlightsWithDetails")
+    public List<Flight> getAllFlightsWithDetails(@RequestParam("departureCity") String departureCity,
+                                                 @RequestParam("arrivalCity") String arrivalCity,
+                                                 @RequestParam("year") String year,
+                                                 @RequestParam("month") String month,
+                                                 @RequestParam("day") String day){
+        List<Flight> allFlightsWithDetails = flightRepository
+                .findAll()
+                .stream()
+                .filter(flight -> flight.getDepartureCity().equals(departureCity) &&
+                                  flight.getArrivalCity().equals(arrivalCity) &&
+                                  flight.getYearValue().equals(year) &&
+                                  flight.getMonthValue().equals(month) &&
+                                  flight.getDayValue().equals(day)
+                       )
+                .toList();
+
+        return allFlightsWithDetails;
+    }
+
     @PostMapping("/addFlight")
     public ResponseEntity<Flight> addFlight(@RequestBody Flight flight) {
 
