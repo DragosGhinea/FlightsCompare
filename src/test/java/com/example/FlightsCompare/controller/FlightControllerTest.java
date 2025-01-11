@@ -23,7 +23,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
-//Generated with GPT
+
 @SpringBootTest
 @AutoConfigureMockMvc
 class FlightControllerTest {
@@ -31,14 +31,10 @@ class FlightControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @MockitoBean
     private FlightRepository flightRepository;
 
-    @MockBean
-    private JwtService jwtService;
-
-    @MockBean
-    private JwtAuthenticationFilter jwtAuthenticationFilter;
+    //Generated with GPT, to see an example
 
     @Test
     void testGetAllFlightsLowerThan() throws Exception {
@@ -61,12 +57,80 @@ class FlightControllerTest {
         when(flightRepository.findAll()).thenReturn(allFlights);
 
         // Perform the GET request for flights with price <= 150
-        mockMvc.perform(get("/allFlightsLowerThan/{price}", 150.0))
+        mockMvc.perform(get("/flight/allFlightsLowerThan/{price}", 150.0))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json")) // Ensure the response type is JSON
                 .andExpect(jsonPath("$").isArray()) // Ensure the response is an array
                 .andExpect(jsonPath("$.length()").value(2)) // Two flights match the criteria
                 .andExpect(jsonPath("$[0].id").value(100)) // First flight
                 .andExpect(jsonPath("$[1].id").value(200)); // Second flight
+    }
+
+    //facut dupa exemplu, dar adaptat la rutele respective
+    @Test
+    void testGetAllFlightsToCity() throws Exception {
+
+        //Create mock Flight objects
+        Flight flight1 = new Flight();
+        flight1.setArrivalCity("Bucharest");
+
+        Flight flight2 = new Flight();
+        flight2.setArrivalCity("London");
+
+        Flight flight3 = new Flight();
+        flight3.setArrivalCity("Bucharest");
+
+        List<Flight> allFlights = Arrays.asList(flight1, flight2, flight3);
+
+        //Mock repo behavior
+        when(flightRepository.findAll()).thenReturn(allFlights);
+
+        //Perform GET request with "Bucharest" as the target city.
+        mockMvc.perform(get("/flight/allFlightsTo/{city}", "Bucharest"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json"))
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$.length()").value(2))
+                .andExpect(jsonPath("$[0].arrivalCity").value("Bucharest"))
+                .andExpect(jsonPath("$[1].arrivalCity").value("Bucharest"));
+    }
+
+    @Test
+    void testGetAllFlightsOnDate() throws Exception {
+
+        //create mock Flight objects
+        Flight flight1 = new Flight();
+        flight1.setYearValue("2025");
+        flight1.setMonthValue("01");
+        flight1.setDayValue("12");
+
+        Flight flight2 = new Flight();
+        flight2.setYearValue("2024");
+        flight2.setMonthValue("01");
+        flight2.setDayValue("12");
+
+        Flight flight3 = new Flight();
+        flight3.setYearValue("2025");
+        flight3.setMonthValue("02");
+        flight3.setDayValue("12");
+
+        List<Flight> allFlights = Arrays.asList(flight1, flight2, flight3);
+
+        //Mock repo
+        when(flightRepository.findAll()).thenReturn(allFlights);
+
+        //Perform GET request with "2025" as the target year and month "01" as target.
+        mockMvc.perform(get("/flight/allFlightsOnDate")
+                .param("year","2025")
+                .param("month","01")
+                .param("day","12"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json"))
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$.length()").value(1))//we are only looking for 1 flight in this case
+                .andExpect(jsonPath("$[0].yearValue").value("2025"))
+                .andExpect(jsonPath("$[0].monthValue").value("01"))
+                .andExpect(jsonPath("$[0].dayValue").value("12"));
+
     }
 }
