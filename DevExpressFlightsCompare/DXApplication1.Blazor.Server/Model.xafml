@@ -1,3 +1,22 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Application>
+<Application PreferredLanguage="(Default language)" Title="FlightsCompare">
+  <SchemaModules>
+    <SchemaModule Name="SystemModule" Version="24.1.6.0" IsNewNode="True" />
+  </SchemaModules>
+  <Views>
+    <ListView Id="Zbor_ListView" ShowAutoFilterRow="True" DataAccessMode="Server" FreezeColumnIndices="True" InlineEditMode="Batch" NewItemRowPosition="Top" AllowEdit="True">
+      <Columns>
+        <ColumnInfo Id="Oid" Index="-1" />
+        <ColumnInfo Id="OldId" Index="-1" />
+        <ColumnInfo Id="OrasPlecare" Index="0" />
+        <ColumnInfo Id="OrasDestinatie" Index="1" />
+        <ColumnInfo Id="DataPlecare" Index="2" />
+        <ColumnInfo Id="DataSosire" Index="3" />
+        <ColumnInfo Id="Pret" EditMask="" DisplayFormat="{0:0 $}" Index="4" />
+        <ColumnInfo Id="DurataZbor" DisplayFormat="{0:0 minute}" EditMask="" Index="5" />
+        <ColumnInfo Id="CodAvion" Index="6" />
+        <ColumnInfo Id="LinkWebsite" Index="7" />
+      </Columns>
+    </ListView>
+  </Views>
 </Application>
