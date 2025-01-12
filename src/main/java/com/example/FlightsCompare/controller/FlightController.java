@@ -100,6 +100,24 @@ public class FlightController {
         return allFlightsWithDetails;
     }
 
+    //Getting all the flights with a similar flightDuration
+    // +- 60 minutes in this case
+    @GetMapping("/allFlightsWithFlightDuration/{flightDuration}")
+    public List<Flight> getAllFlightsWithSimilarDuration(@PathVariable(name = "flightDuration") Integer flightDuration) {
+
+        final Integer approximationInMinutes = 60;
+
+        List<Flight> allFlightsWithSimilarDuration = flightRepository
+                .findAll()
+                .stream()
+                .filter(flight -> flight.getFlightDuration() <= flightDuration + approximationInMinutes &&
+                                  flight.getFlightDuration() >= flightDuration - approximationInMinutes
+                       )
+                .toList();
+
+        return allFlightsWithSimilarDuration;
+    }
+
     @PostMapping("/addFlight")
     public ResponseEntity<Flight> addFlight(@RequestBody Flight flight) {
 
