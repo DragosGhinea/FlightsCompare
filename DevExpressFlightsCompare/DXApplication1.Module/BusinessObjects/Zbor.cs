@@ -23,8 +23,9 @@ namespace FlightsCompare.Module.BusinessObjects
             // Place your initialization code here
         }
 
-        private string orasPlecare;
-        private string orasDestinatie;
+        int oldId;
+        private Oras orasPlecare;
+        private Oras orasDestinatie;
         private DateTime dataPlecare;
         private DateTime dataSosire;
         private decimal pret;
@@ -32,13 +33,19 @@ namespace FlightsCompare.Module.BusinessObjects
         private string codAvion;
         private string linkWebsite;
 
-        public string OrasPlecare
+        
+        public int OldId
+        {
+            get => oldId;
+            set => SetPropertyValue(nameof(OldId), ref oldId, value);
+        }
+        public Oras OrasPlecare
         {
             get => orasPlecare;
             set => SetPropertyValue(nameof(OrasPlecare), ref orasPlecare, value);
         }
 
-        public string OrasDestinatie
+        public Oras OrasDestinatie
         {
             get => orasDestinatie;
             set => SetPropertyValue(nameof(OrasDestinatie), ref orasDestinatie, value);

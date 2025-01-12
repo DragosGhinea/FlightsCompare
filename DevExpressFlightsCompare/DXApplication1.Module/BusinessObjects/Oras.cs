@@ -15,6 +15,7 @@ using System.Text;
 namespace FlightsCompare.Module.BusinessObjects
 {
     [DefaultClassOptions]
+    [DefaultProperty(nameof(Denumire))]
     public class Oras : BaseObject
     {
         public Oras(Session session)
