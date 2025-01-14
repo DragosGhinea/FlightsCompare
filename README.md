@@ -3,9 +3,9 @@ AMSS / MOPS university project
 
 ## Cerinte AMSS:
 
-Documentarea proiectului + cerințe funcționale și nonfuncționale: [SoftwareRequirements](https://github.com/DragosGhinea/FlightsCompare/main/AMSS/SoftwareRequirements.pdf)
+Documentarea proiectului + cerințe funcționale și nonfuncționale: [SoftwareRequirements](https://github.com/DragosGhinea/FlightsCompare/blob/main/AMSS/SoftwareRequirements.pdf)
 
-Diagrama de overview + design patterns: [Folder Diagrame Individuale](https://github.com/DragosGhinea/FlightsCompare/main/AMSS/DiagramaGenerala_DesignPatterns.pdf)
+Diagrama de overview + design patterns: [Folder Diagrame Individuale](https://github.com/DragosGhinea/FlightsCompare/blob/main/AMSS/DiagramaGenerala_DesignPatterns.pdf)
 
 Diagrame individuale: [Folder Diagrame Individuale](https://github.com/DragosGhinea/FlightsCompare/main/AMSS/individuale)
 
