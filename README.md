@@ -7,7 +7,7 @@ Documentarea proiectului + cerințe funcționale și nonfuncționale: [SoftwareR
 
 Diagrama de overview + design patterns: [Folder Diagrame Individuale](https://github.com/DragosGhinea/FlightsCompare/blob/main/AMSS/DiagramaGenerala_DesignPatterns.pdf)
 
-Diagrame individuale: [Folder Diagrame Individuale](https://github.com/DragosGhinea/FlightsCompare/main/AMSS/individuale)
+Diagrame individuale: [Folder Diagrame Individuale](https://github.com/DragosGhinea/FlightsCompare/tree/main/AMSS/individuale)
 
 Contribuții:
  * Ghinea Dragoș-Dumitru: Realizarea modului de autentificare și autorizare, scriere de teste pentru acestea
