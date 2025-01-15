@@ -15,4 +15,4 @@ Contribuții:
  * Amza Ciprian: Realizarea modelului de date, contribuirea la scrapere
  * Dima Andrei: Realizarea frontend-ului
 
-Toți membrii au lucrat în mod egal (25%)
+Toți membrii au lucrat în mod egal (25%).
