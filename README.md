@@ -11,8 +11,8 @@ Diagrame individuale: [Folder Diagrame Individuale](https://github.com/DragosGhi
 
 Contribuții:
  * Ghinea Dragoș-Dumitru: Realizarea modului de autentificare și autorizare, scriere de teste pentru acestea
- * Cucu Raul-Mihai: Realizare de scraper, contribuit la modulul de date, scriere de teste
- * Amza Ciprian: Realizarea modului de date, contribuirea la scrapere
+ * Cucu Raul-Mihai: Realizare de scraper, contribuit la modelul de date, scriere de teste
+ * Amza Ciprian: Realizarea modelului de date, contribuirea la scrapere
  * Dima Andrei: Realizarea frontend-ului
 
-Toți membrii au lucrat în mod egal (25%)
+Toți membrii au lucrat în mod egal (25%).
