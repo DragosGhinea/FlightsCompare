@@ -5,11 +5,64 @@
 </head>
 <body>
 <h1>Login with OAuth2</h1>
-<form th:action="@{/v1/auth/login/oauth2}" method="post">
-    <label for="provider">OAuth2 Provider:</label>
-    <input type="text" id="provider" name="provider" placeholder="e.g., Google, Facebook" required>
+<form id="oauth2Form" action="/v1/auth/login/oauth2" method="post">
+    <label for="clientRegistrationId">OAuth2 Provider:</label>
+    <input type="text" id="clientRegistrationId" name="clientRegistrationId" placeholder="e.g., Discord, GitHub" required>
     <br>
+
+    <label for="accessToken">Access Token:</label>
+    <input type="text" id="accessToken" name="accessToken" placeholder="Enter OAuth2 Access Token" required>
+    <br>
+
     <button type="submit">Login</button>
 </form>
+
+<script>
+    const form = document.getElementById('oauth2Form');
+
+    form.addEventListener('submit', function (event) {
+        event.preventDefault();  // Prevent the form from submitting the default way
+
+        const formData = new FormData(form);
+        const clientRegistrationId = formData.get('clientRegistrationId');
+        const accessToken = formData.get('accessToken');
+
+        // Create an object with the data to send
+        const data = {
+            clientRegistrationId: clientRegistrationId,
+            accessToken: accessToken
+        };
+
+        // Send the data to the backend via a POST request
+        fetch('/v1/auth/login/oauth2', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        })
+        .then(response => {
+            if (response.ok) {
+                response.json().then(jsonResponse => {
+                    alert('Login successful!');
+
+                    // Store the tokens in local storage
+                    localStorage.setItem('access_token', jsonResponse.access_token);
+                    localStorage.setItem('refresh_token', jsonResponse.refresh_token);
+
+                    // Redirect to the success page
+                    window.location.href = '/success'; // Redirect to the success page
+                });
+            } else {
+                response.json().then(msg => {
+                    alert("Error: " + msg.message3); // Display the error message
+                });
+            }
+        })
+        .catch(error => {
+            alert('Something went wrong: ' + error.message); // Handle any errors that occur during the fetch request
+        });
+    });
+</script>
 </body>
 </html>
