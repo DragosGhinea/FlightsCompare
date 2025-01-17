@@ -5,14 +5,62 @@
 </head>
 <body>
 <h1>Login</h1>
-<form th:action="@{/v1/auth/login}" method="post">
-    <label for="username">Username:</label>
-    <input type="text" id="username" name="username" required>
+<form id="login-form">
+    <label for="email">email:</label>
+    <input type="text" id="email" name="email" required>
     <br>
     <label for="password">Password:</label>
     <input type="password" id="password" name="password" required>
     <br>
     <button type="submit">Login</button>
 </form>
+
+<script>
+    // Handle form submission with JavaScript
+    document.getElementById('login-form').addEventListener('submit', function(event) {
+        event.preventDefault(); // Prevent default form submission
+
+        // Get form values
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+
+        // Prepare data for the POST request
+        const data = {
+            email: email,
+            password: password
+        };
+
+        // Send the login request using Fetch API
+        fetch("/v1/auth/login", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => {
+            if (response.ok) {
+                // If the response is successful (HTTP 200), redirect to the success page
+                response.json().then(data => {
+                    alert("Logged in successfully!");
+
+                    // Redirect with the message parameter
+                    const queryParams = new URLSearchParams({
+                        message: "Logged in successfully"
+                    });
+                    window.location.href = `/success?${queryParams}`;
+                });
+            } else {
+                // If the response is not successful, display an alert with an error message
+                response.json().then(error => {
+                    alert("Email or password invalid");
+                });
+            }
+        })
+        .catch(err => {
+            alert("An error occurred: " + err);
+        });
+    });
+</script>
 </body>
 </html>

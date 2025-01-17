@@ -37,10 +37,14 @@
             if (response.ok) {
                 response.json().then(data => {
                     alert("200: Registration successful!");
+                    localStorage.setItem("access_token", data.access_token);
+                    localStorage.setItem("refresh_token", data.refresh_token);
+                    localStorage.setItem("username", formData.get("username"));
+                    localStorage.setItem("email", formData.get("email"));
+
                     // Redirect to another page and pass access_token and refresh_token
                     const queryParams = new URLSearchParams({
-                        access_token: data.access_token,
-                        refresh_token: data.refresh_token
+                        message: "Registration was successful!",
                     });
                     console.log("Redirecting to success page...");
                     window.location.href = `/success?${queryParams}`;
