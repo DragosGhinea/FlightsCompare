@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>OAuth2 Login</title>
+</head>
+<body>
+<h1>Login with OAuth2</h1>
+<form th:action="@{/v1/auth/login/oauth2}" method="post">
+    <label for="provider">OAuth2 Provider:</label>
+    <input type="text" id="provider" name="provider" placeholder="e.g., Google, Facebook" required>
+    <br>
+    <button type="submit">Login</button>
+</form>
+</body>
+</html>
