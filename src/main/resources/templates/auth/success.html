@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Registration Success</title>
+</head>
+<body>
+<h1>Registration Successful!</h1>
+<p>Access Token: <span id="access_token"></span></p>
+<p>Refresh Token: <span id="refresh_token"></span></p>
+
+<script>
+    // Parse tokens from URL query parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const accessToken = urlParams.get('access_token');
+    const refreshToken = urlParams.get('refresh_token');
+
+    // Display tokens
+    document.getElementById('access_token').textContent = accessToken || 'N/A';
+    document.getElementById('refresh_token').textContent = refreshToken || 'N/A';
+</script>
+</body>
+</html>

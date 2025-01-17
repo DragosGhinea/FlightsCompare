@@ -35,4 +35,9 @@ public class UIController {
     public String validatePage() {
         return "auth/validate";
     }
+
+    @GetMapping("/success")
+    public String successPage() {
+        return "auth/success";
+    }
 }

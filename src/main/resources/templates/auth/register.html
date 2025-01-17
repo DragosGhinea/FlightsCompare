@@ -1,11 +1,4 @@
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <title>Register</title>
-</head>
-<body>
-<h1>Register</h1>
-<form th:action="@{/v1/auth/register}" method="post">
+<form id="registerForm">
     <label for="username">Username:</label>
     <input type="text" id="username" name="username" required>
     <br>
@@ -15,7 +8,51 @@
     <label for="email">Email:</label>
     <input type="email" id="email" name="email" required>
     <br>
-    <button type="submit">Register</button>
+    <label for="accessToken">Access Token:</label>
+    <input type="text" id="accessToken" name="accessToken" required>
+    <br>
+    <button type="button" onclick="submitForm()">Register</button>
 </form>
-</body>
-</html>
+
+<script>
+    function submitForm() {
+        const form = document.getElementById("registerForm");
+        const formData = new FormData(form);
+
+        const data = {
+            username: formData.get("username"),
+            password: formData.get("password"),
+            email: formData.get("email"),
+            accessToken: formData.get("accessToken")
+        };
+
+        fetch("/v1/auth/register", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data)
+        })
+        .then(response => {
+            if (response.ok) {
+                response.json().then(data => {
+                    alert("200: Registration successful!");
+                    // Redirect to another page and pass access_token and refresh_token
+                    const queryParams = new URLSearchParams({
+                        access_token: data.access_token,
+                        refresh_token: data.refresh_token
+                    });
+                    console.log("Redirecting to success page...");
+                    window.location.href = `/success?${queryParams}`;
+
+                });
+            } else {
+                response.json()
+                    .then(error => alert("Error: " + error.message))
+                    .catch(() => alert("Error: Unable to parse error response."));
+            }
+        })
+        .catch(err => alert("Error: " + err));
+
+        }
+</script>
