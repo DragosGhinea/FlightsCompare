@@ -1,33 +1,59 @@
 package com.example.FlightsCompare.security;
 
-import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import java.security.Key;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 
-// https://github.com/ali-bouali/spring-boot-3-jwt-security/blob/main/src/main/java/com/alibou/security/config/JwtService.java
+import javax.crypto.SecretKey;
 
 @Service
 public class JwtService {
 
-    @Value("${application.security.jwt.secret-key}")
-    private String secretKey;
-    @Value("${application.security.jwt.access-token.expiration-time}")
-    private long accessExpiration;
-    @Value("${application.security.jwt.refresh-token.expiration-time}")
-    private long refreshExpiration;
+    private static final long DAY_IN_MILLISECONDS = 86_400_000L;
+    private long lastValidDate;
+
+    private byte[] generateHmacKey() {
+        SecretKey secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS512);
+        //        return Base64.getEncoder().encodeToString(encodedKey); // to string
+        return secretKey.getEncoded();
+    }
+
+    // old approach
+//    @Value("${application.security.jwt.secret-key}")
+//    private String secretKey;
+
+    private final List<byte[]> secretKeys = new ArrayList<>();
+
+    public JwtService(
+            @Value("${application.security.jwt.access-token.expiration-time}")
+            long accessExpiration,
+            @Value("${application.security.jwt.refresh-token.expiration-time}")
+            long refreshExpiration
+    ) {
+        this.accessExpiration = accessExpiration;
+        this.refreshExpiration = refreshExpiration;
+
+        long keyCount = refreshExpiration / DAY_IN_MILLISECONDS;
+        if (refreshExpiration % DAY_IN_MILLISECONDS != 0) {
+            keyCount++;
+        }
+
+        for (int i = 0; i < keyCount; i++) {
+            secretKeys.add(generateHmacKey());
+        }
+
+        lastValidDate = System.currentTimeMillis();
+    }
+
+    private final long accessExpiration;
+    private final long refreshExpiration;
 
     public String extractUsername(String token) {
         try {
@@ -68,13 +94,16 @@ public class JwtService {
             UserDetails userDetails,
             long expiration
     ) {
+
+        long issuedAt = System.currentTimeMillis();
+
         return Jwts
                 .builder()
                 .setClaims(extraClaims)
                 .setSubject(userDetails.getUsername())
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + expiration))
-                .signWith(getSignInKey(), SignatureAlgorithm.HS256)
+                .setIssuedAt(new Date(issuedAt))
+                .setExpiration(new Date(issuedAt + expiration))
+                .signWith(getSignInKey(issuedAt), SignatureAlgorithm.HS512)
                 .compact();
     }
 
@@ -95,16 +124,38 @@ public class JwtService {
     }
 
     private Claims extractAllClaims(String token) {
+        String tokenWithoutSignature = token.substring(0, token.lastIndexOf('.') + 1);
+        Date issuedAt = Jwts
+                .parserBuilder()
+                .build()
+                .parseClaimsJwt(tokenWithoutSignature)
+                .getBody()
+                .getIssuedAt();
+
         return Jwts
                 .parserBuilder()
-                .setSigningKey(getSignInKey())
+                .setSigningKey(getSignInKey(issuedAt.toInstant().toEpochMilli()))
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
     }
 
-    private Key getSignInKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
-        return Keys.hmacShaKeyFor(keyBytes);
+    private void rotateKeys() {
+        lastValidDate += DAY_IN_MILLISECONDS;
+        secretKeys.remove(0);
+        secretKeys.add(generateHmacKey());
+    }
+
+    private Key getSignInKey(long issuedAtMilliseconds) {
+//        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
+//        return Keys.hmacShaKeyFor(keyBytes);
+
+        int keyIndex = (int) (((issuedAtMilliseconds) - lastValidDate) / DAY_IN_MILLISECONDS);
+        if (keyIndex == secretKeys.size()) {
+            rotateKeys();
+            keyIndex--;
+        }
+
+        return Keys.hmacShaKeyFor(secretKeys.get(keyIndex));
     }
 }
