@@ -1,14 +1,58 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Session information</title>
+    <title>Session Information</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+        header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            text-align: center;
+        }
+        main {
+            padding: 20px;
+            max-width: 800px;
+            margin: 20px auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            overflow-wrap: break-word;
+            word-wrap: break-word;
+        }
+        pre {
+            background-color: #f4f4f4;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        p {
+            margin: 10px 0;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+        span {
+            word-break: break-all;
+        }
+    </style>
 </head>
 <body>
-<h1 id="message"></h1>
-<p>Access Token: <span id="access_token"></span></p>
-<p>Refresh Token: <span id="refresh_token"></span></p>
-<p>Email: <span id="email"></span></p>
-<p>Username: <span id="username"></span></p>
+<header>
+    <h1 id="message">Session Information</h1>
+</header>
+<main>
+    <p><strong>Access Token:</strong> <span id="access_token"></span></p>
+    <p><strong>Refresh Token:</strong> <span id="refresh_token"></span></p>
+    <pre id="user_data">No data fetched</pre>
+</main>
 
 <script>
     const urlParams = new URLSearchParams(window.location.search);
@@ -17,15 +61,38 @@
     // Retrieve the stored values from localStorage
     const accessToken = localStorage.getItem("access_token");
     const refreshToken = localStorage.getItem("refresh_token");
-    const email = localStorage.getItem("email");
-    const username = localStorage.getItem("username");
 
     // Display the retrieved values
     document.getElementById('access_token').textContent = accessToken || 'N/A';
     document.getElementById('refresh_token').textContent = refreshToken || 'N/A';
-    document.getElementById('email').textContent = email || 'N/A';
-    document.getElementById('username').textContent = username || 'N/A';
     document.getElementById('message').textContent = message || 'Session information';
+
+    // Make an additional request to retrieve user details
+    if (accessToken) {
+        fetch('http://localhost:8081/v1/users/me', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${accessToken}`
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                alert(`Error: ${response.status} ${response.statusText}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Display the JSON data in a prettified format
+            document.getElementById('user_data').textContent = JSON.stringify(data, null, 2);
+        })
+        .catch(error => {
+            console.error('Failed to fetch user details:', error);
+            document.getElementById('message').textContent = 'Error fetching user details';
+        });
+    } else {
+        document.getElementById('user_data').textContent = 'Access token is missing';
+        document.getElementById('message').textContent = 'Access token is missing';
+    }
 </script>
 </body>
 </html>
