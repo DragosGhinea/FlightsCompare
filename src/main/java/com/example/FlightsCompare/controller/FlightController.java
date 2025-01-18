@@ -51,6 +51,18 @@ public class FlightController {
         return allFlightsCheaperThanPrice;
     }
 
+    @GetMapping("/allFlightsLowerThan/{price}/{city}")
+    public List<Flight> getAllFlightsLowerThanToCity(@PathVariable(name = "price") Double price, @PathVariable(name = "city") String city) {
+
+        List<Flight> allFlightsCheaperThanPriceToCity = flightRepository
+                .findAll()
+                .stream()
+                .filter(flight -> flight.getPrice() <= price && flight.getArrival().equals(city))
+                .toList();
+
+        return allFlightsCheaperThanPriceToCity;
+    }
+
     @GetMapping("/allFlightsGreaterThan/{price}")
     public List<Flight> getAllFlightsGreaterThan(@PathVariable(name = "price") Double price) {
 
