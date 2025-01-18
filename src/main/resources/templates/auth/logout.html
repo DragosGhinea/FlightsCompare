@@ -2,11 +2,25 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Logout</title>
+    <script>
+        // Function to clear localStorage and handle redirection
+        function clearLocalStorageAndRedirect() {
+            // Clear localStorage
+            localStorage.removeItem('access_token');
+            localStorage.removeItem('refresh_token');
+            localStorage.removeItem('email');
+            localStorage.removeItem('username');
+
+            // Redirect the user to a logged out page or home page
+            window.location.href = "/home"; // Adjust the URL as per your requirement
+        }
+    </script>
 </head>
 <body>
-<h1>Logout</h1>
-<form action="/v1/auth/logout" method="post">
-    <button type="submit">Logout</button>
-</form>
+<h1>Logging out...</h1>
+<script>
+    // Call the function to clear localStorage and redirect the user
+    clearLocalStorageAndRedirect();
+</script>
 </body>
 </html>
